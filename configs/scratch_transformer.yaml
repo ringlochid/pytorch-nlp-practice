@@ -1,0 +1,32 @@
+seed: 42
+experiment_name: scratch_transformer_ag_news_cpu
+
+system:
+  device: cpu
+  output_root: runs
+
+data:
+  train_subset: 20000
+  val_ratio: 0.1
+  test_subset: 2000
+  max_length: 64
+  batch_size: 16
+  num_workers: 0
+  max_vocab_size: 20000
+  min_freq: 2
+  lowercase: true
+
+model:
+  name: transformer
+  max_length: 64
+  d_model: 128
+  nhead: 4
+  num_layers: 2
+  dim_feedforward: 256
+  dropout: 0.1
+
+train:
+  epochs: 5
+  lr: 0.001
+  weight_decay: 0.01
+  grad_clip: 1.0

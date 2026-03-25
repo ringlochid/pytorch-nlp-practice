@@ -1,0 +1,11 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.11.0+cpu
+transformers
+datasets
+evaluate
+scikit-learn
+tqdm
+PyYAML
+# optional later:
+# matplotlib
+# pandas
