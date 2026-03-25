@@ -10,7 +10,6 @@ import torch
 from datasets import load_dataset
 from torch.nn.utils.rnn import pad_sequence
 from torch.utils.data import DataLoader, Dataset
-from transformers import DataCollatorWithPadding
 
 PAD_TOKEN = "<pad>"
 UNK_TOKEN = "<unk>"
@@ -150,46 +149,5 @@ def make_scratch_dataloaders(config: dict, seed: int):
         "val_loader": val_loader,
         "test_loader": test_loader,
         "vocab": vocab,
-        "label_names": label_names,
-    }
-
-
-def make_bert_dataloaders(config: dict, tokenizer, seed: int):
-    train_ds, val_ds, test_ds, label_names = _load_ag_news_splits(
-        train_subset=config["train_subset"],
-        val_ratio=config["val_ratio"],
-        test_subset=config.get("test_subset"),
-        seed=seed,
-    )
-
-    max_length = config["max_length"]
-
-    def tokenize_batch(batch):
-        return tokenizer(batch["text"], truncation=True, max_length=max_length)
-
-    train_tok = train_ds.map(tokenize_batch, batched=True, remove_columns=["text"])
-    val_tok = val_ds.map(tokenize_batch, batched=True, remove_columns=["text"])
-    test_tok = test_ds.map(tokenize_batch, batched=True, remove_columns=["text"])
-
-    train_tok = train_tok.rename_column("label", "labels")
-    val_tok = val_tok.rename_column("label", "labels")
-    test_tok = test_tok.rename_column("label", "labels")
-
-    collator = DataCollatorWithPadding(tokenizer=tokenizer, padding=True)
-    loader_kwargs = {
-        "batch_size": config["batch_size"],
-        "num_workers": config.get("num_workers", 0),
-        "pin_memory": False,
-        "collate_fn": collator,
-    }
-
-    train_loader = DataLoader(train_tok, shuffle=True, **loader_kwargs)
-    val_loader = DataLoader(val_tok, shuffle=False, **loader_kwargs)
-    test_loader = DataLoader(test_tok, shuffle=False, **loader_kwargs)
-
-    return {
-        "train_loader": train_loader,
-        "val_loader": val_loader,
-        "test_loader": test_loader,
         "label_names": label_names,
     }

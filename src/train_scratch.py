@@ -8,62 +8,25 @@ import torch.nn as nn
 
 from data import make_scratch_dataloaders
 from engine import evaluate_scratch, save_checkpoint, train_epoch_scratch
-from models.gru_classifier import GRUClassifier
-from models.lstm_classifier import LSTMClassifier
 from models.rnn_classifier import RNNClassifier
-from models.transformer_encoder_classifier import TransformerEncoderClassifier
 from utils import count_parameters, get_device, load_yaml, make_run_dir, save_json, seed_everything
 
 
 def build_model(model_cfg: dict, vocab_size: int, num_classes: int, pad_id: int):
     name = model_cfg["name"]
+    if name != "rnn":
+        raise ValueError(f"Unsupported model name: {name}. Only 'rnn' is kept in this repo right now.")
 
-    if name == "rnn":
-        return RNNClassifier(
-            vocab_size=vocab_size,
-            num_classes=num_classes,
-            pad_id=pad_id,
-            emb_dim=model_cfg["emb_dim"],
-            hidden_dim=model_cfg["hidden_dim"],
-            num_layers=model_cfg["num_layers"],
-            dropout=model_cfg["dropout"],
-            bidirectional=model_cfg.get("bidirectional", False),
-        )
-    if name == "gru":
-        return GRUClassifier(
-            vocab_size=vocab_size,
-            num_classes=num_classes,
-            pad_id=pad_id,
-            emb_dim=model_cfg["emb_dim"],
-            hidden_dim=model_cfg["hidden_dim"],
-            num_layers=model_cfg["num_layers"],
-            dropout=model_cfg["dropout"],
-            bidirectional=model_cfg.get("bidirectional", False),
-        )
-    if name == "lstm":
-        return LSTMClassifier(
-            vocab_size=vocab_size,
-            num_classes=num_classes,
-            pad_id=pad_id,
-            emb_dim=model_cfg["emb_dim"],
-            hidden_dim=model_cfg["hidden_dim"],
-            num_layers=model_cfg["num_layers"],
-            dropout=model_cfg["dropout"],
-            bidirectional=model_cfg.get("bidirectional", False),
-        )
-    if name == "transformer":
-        return TransformerEncoderClassifier(
-            vocab_size=vocab_size,
-            num_classes=num_classes,
-            pad_id=pad_id,
-            max_length=model_cfg["max_length"],
-            d_model=model_cfg["d_model"],
-            nhead=model_cfg["nhead"],
-            num_layers=model_cfg["num_layers"],
-            dim_feedforward=model_cfg["dim_feedforward"],
-            dropout=model_cfg["dropout"],
-        )
-    raise ValueError(f"Unsupported model name: {name}")
+    return RNNClassifier(
+        vocab_size=vocab_size,
+        num_classes=num_classes,
+        pad_id=pad_id,
+        emb_dim=model_cfg["emb_dim"],
+        hidden_dim=model_cfg["hidden_dim"],
+        num_layers=model_cfg["num_layers"],
+        dropout=model_cfg["dropout"],
+        bidirectional=model_cfg.get("bidirectional", False),
+    )
 
 
 def main():

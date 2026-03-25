@@ -37,16 +37,11 @@ That order shows the real pipeline:
 python src/train_scratch.py --config configs/scratch_rnn.yaml
 ```
 
-## 5) Then climb the ladder
+## 5) After that
 
-No big refactor needed. Just switch configs / model family:
+Stop there for now.
 
-```bash
-python src/train_scratch.py --config configs/scratch_gru.yaml
-python src/train_scratch.py --config configs/scratch_lstm.yaml
-python src/train_scratch.py --config configs/scratch_transformer.yaml
-python src/train_bert.py --config configs/bert_tiny.yaml
-```
+The repo only keeps the RNN baseline. When you want to build GRU / LSTM / Transformer yourself, add them one by one.
 
 ## What the `notebooks/` folder is for
 
