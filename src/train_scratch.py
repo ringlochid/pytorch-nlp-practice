@@ -9,6 +9,7 @@ import torch.nn as nn
 from data import make_scratch_dataloaders
 from engine import evaluate_scratch, save_checkpoint, train_epoch_scratch
 from models.gru_classifier import GRUClassifier
+from models.lstm_classifier import LSTMClassifier
 from models.rnn_classifier import RNNClassifier
 from utils import (
     count_parameters,
@@ -37,6 +38,18 @@ def build_model(model_cfg: dict, vocab_size: int, num_classes: int, pad_id: int)
 
     elif name == "gru":
         return GRUClassifier(
+            vocab_size=vocab_size,
+            num_classes=num_classes,
+            pad_id=pad_id,
+            emb_dim=model_cfg["emb_dim"],
+            hidden_dim=model_cfg["hidden_dim"],
+            num_layers=model_cfg["num_layers"],
+            dropout=model_cfg["dropout"],
+            bidirectional=model_cfg.get("bidirectional", False),
+        )
+
+    elif name == "lstm":
+        return LSTMClassifier(
             vocab_size=vocab_size,
             num_classes=num_classes,
             pad_id=pad_id,

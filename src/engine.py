@@ -8,11 +8,15 @@ from tqdm.auto import tqdm
 from metrics import classification_metrics
 
 
-def train_epoch_scratch(model, loader, optimizer, criterion, device, grad_clip: float | None = None):
+def train_epoch_scratch(
+    model, loader, optimizer, criterion, device, grad_clip: float | None = None
+):
     model.train()
     total_loss = 0.0
     all_preds = []
     all_labels = []
+
+    torch.autograd.set_detect_anomaly(True)
 
     for batch in tqdm(loader, desc="train", leave=False):
         input_ids = batch["input_ids"].to(device)
@@ -20,6 +24,7 @@ def train_epoch_scratch(model, loader, optimizer, criterion, device, grad_clip: 
         labels = batch["labels"].to(device)
 
         optimizer.zero_grad(set_to_none=True)
+
         logits = model(input_ids=input_ids, lengths=lengths)
         loss = criterion(logits, labels)
         loss.backward()
