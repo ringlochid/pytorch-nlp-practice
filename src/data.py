@@ -46,7 +46,9 @@ class Vocab:
 
 
 class ScratchTextDataset(Dataset):
-    def __init__(self, hf_dataset, vocab: Vocab, max_length: int, lowercase: bool = True):
+    def __init__(
+        self, hf_dataset, vocab: Vocab, max_length: int, lowercase: bool = True
+    ):
         self.dataset = hf_dataset
         self.vocab = vocab
         self.max_length = max_length
@@ -64,7 +66,12 @@ class ScratchTextDataset(Dataset):
         return token_ids, int(row["label"])
 
 
-def build_vocab(texts: Iterable[str], max_vocab_size: int = 20000, min_freq: int = 2, lowercase: bool = True) -> Vocab:
+def build_vocab(
+    texts: Iterable[str],
+    max_vocab_size: int = 20000,
+    min_freq: int = 2,
+    lowercase: bool = True,
+) -> Vocab:
     counter = Counter()
     for text in texts:
         counter.update(simple_tokenize(text, lowercase=lowercase))
@@ -97,7 +104,9 @@ def scratch_collate_fn(batch, pad_id: int):
     return {"input_ids": input_ids, "lengths": lengths, "labels": labels}
 
 
-def _load_ag_news_splits(train_subset: int | None, val_ratio: float, test_subset: int | None, seed: int):
+def _load_ag_news_splits(
+    train_subset: int | None, val_ratio: float, test_subset: int | None, seed: int
+):
     train_split = f"train[:{train_subset}]" if train_subset else "train"
     test_split = f"test[:{test_subset}]" if test_subset else "test"
 
@@ -127,9 +136,15 @@ def make_scratch_dataloaders(config: dict, seed: int):
     max_length = config["max_length"]
     lowercase = config.get("lowercase", True)
 
-    train_set = ScratchTextDataset(train_ds, vocab=vocab, max_length=max_length, lowercase=lowercase)
-    val_set = ScratchTextDataset(val_ds, vocab=vocab, max_length=max_length, lowercase=lowercase)
-    test_set = ScratchTextDataset(test_ds, vocab=vocab, max_length=max_length, lowercase=lowercase)
+    train_set = ScratchTextDataset(
+        train_ds, vocab=vocab, max_length=max_length, lowercase=lowercase
+    )
+    val_set = ScratchTextDataset(
+        val_ds, vocab=vocab, max_length=max_length, lowercase=lowercase
+    )
+    test_set = ScratchTextDataset(
+        test_ds, vocab=vocab, max_length=max_length, lowercase=lowercase
+    )
 
     collate = partial(scratch_collate_fn, pad_id=vocab.pad_id)
 

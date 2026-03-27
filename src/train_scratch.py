@@ -8,25 +8,49 @@ import torch.nn as nn
 
 from data import make_scratch_dataloaders
 from engine import evaluate_scratch, save_checkpoint, train_epoch_scratch
+from models.gru_classifier import GRUClassifier
 from models.rnn_classifier import RNNClassifier
-from utils import count_parameters, get_device, load_yaml, make_run_dir, save_json, seed_everything
+from utils import (
+    count_parameters,
+    get_device,
+    load_yaml,
+    make_run_dir,
+    save_json,
+    seed_everything,
+)
 
 
 def build_model(model_cfg: dict, vocab_size: int, num_classes: int, pad_id: int):
     name = model_cfg["name"]
-    if name != "rnn":
-        raise ValueError(f"Unsupported model name: {name}. Only 'rnn' is kept in this repo right now.")
 
-    return RNNClassifier(
-        vocab_size=vocab_size,
-        num_classes=num_classes,
-        pad_id=pad_id,
-        emb_dim=model_cfg["emb_dim"],
-        hidden_dim=model_cfg["hidden_dim"],
-        num_layers=model_cfg["num_layers"],
-        dropout=model_cfg["dropout"],
-        bidirectional=model_cfg.get("bidirectional", False),
-    )
+    if name == "rnn":
+        return RNNClassifier(
+            vocab_size=vocab_size,
+            num_classes=num_classes,
+            pad_id=pad_id,
+            emb_dim=model_cfg["emb_dim"],
+            hidden_dim=model_cfg["hidden_dim"],
+            num_layers=model_cfg["num_layers"],
+            dropout=model_cfg["dropout"],
+            bidirectional=model_cfg.get("bidirectional", False),
+        )
+
+    elif name == "gru":
+        return GRUClassifier(
+            vocab_size=vocab_size,
+            num_classes=num_classes,
+            pad_id=pad_id,
+            emb_dim=model_cfg["emb_dim"],
+            hidden_dim=model_cfg["hidden_dim"],
+            num_layers=model_cfg["num_layers"],
+            dropout=model_cfg["dropout"],
+            bidirectional=model_cfg.get("bidirectional", False),
+        )
+
+    else:
+        raise ValueError(
+            f"Unsupported model name: {name}. Only 'rnn' is kept in this repo right now."
+        )
 
 
 def main():
@@ -107,7 +131,9 @@ def main():
             "test": test_metrics,
         },
     )
-    Path(run_dir / "config_used.yaml").write_text(Path(args.config).read_text(encoding="utf-8"), encoding="utf-8")
+    Path(run_dir / "config_used.yaml").write_text(
+        Path(args.config).read_text(encoding="utf-8"), encoding="utf-8"
+    )
 
 
 if __name__ == "__main__":

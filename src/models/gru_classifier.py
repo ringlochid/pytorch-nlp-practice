@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 
 
-class RNNClassifier(nn.Module):
+class GRUClassifier(nn.Module):
     def __init__(
         self,
         vocab_size: int,
@@ -19,7 +19,7 @@ class RNNClassifier(nn.Module):
         super().__init__()
         self.pad_id = pad_id
         self.embedding = nn.Embedding(vocab_size, emb_dim, padding_idx=pad_id)
-        self.encoder = nn.RNN(
+        self.encoder = nn.GRU(
             input_size=emb_dim,
             hidden_size=hidden_dim,
             num_layers=num_layers,
@@ -27,7 +27,7 @@ class RNNClassifier(nn.Module):
             dropout=dropout if num_layers > 1 else 0.0,
             bidirectional=bidirectional,
         )
-        out_dim = hidden_dim * (2 if bidirectional else 1)
+        out_dim = hidden_dim * 2 if bidirectional else hidden_dim
         self.dropout = nn.Dropout(dropout)
         self.classifier = nn.Linear(out_dim, num_classes)
 
@@ -37,6 +37,6 @@ class RNNClassifier(nn.Module):
         embedded = self.embedding(input_ids)
         encoded, _ = self.encoder(embedded)
         mask = (input_ids != self.pad_id).unsqueeze(-1)
-        encoded = encoded * mask
+        encoded *= mask
         pooled = encoded.sum(dim=1) / mask.sum(dim=1).clamp(min=1)
         return self.classifier(self.dropout(pooled))
