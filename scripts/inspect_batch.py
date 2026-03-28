@@ -22,7 +22,9 @@ def resolve_config(path_str: str) -> Path:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Inspect one collated batch and decode a few samples.")
+    parser = argparse.ArgumentParser(
+        description="Inspect one collated batch and decode a few samples."
+    )
     parser.add_argument("--config", default="configs/smoke_rnn.yaml")
     parser.add_argument("--split", choices=["train", "val", "test"], default="train")
     parser.add_argument("--samples", type=int, default=2)
@@ -64,15 +66,19 @@ def main() -> None:
         label_id = int(labels[i].item())
         ids_all = input_ids[i].tolist()
         ids_active = ids_all[:true_len]
-        ids_tail = ids_all[true_len:true_len + min(8, max(0, len(ids_all) - true_len))]
-        tokens_active = [vocab.itos[idx] for idx in ids_active[:args.token_preview]]
+        ids_tail = ids_all[
+            true_len : true_len + min(8, max(0, len(ids_all) - true_len))
+        ]
+        tokens_active = [vocab.itos[idx] for idx in ids_active[: args.token_preview]]
 
         print(f"sample {i}")
         print(f"  label_id: {label_id}")
         print(f"  label_name: {label_names[label_id]}")
         print(f"  true_length: {true_len}")
         print(f"  padded_row_length: {len(ids_all)}")
-        print(f"  active_ids[:{args.token_preview}]: {ids_active[:args.token_preview]}")
+        print(
+            f"  active_ids[:{args.token_preview}]: {ids_active[: args.token_preview]}"
+        )
         print(f"  active_tokens[:{args.token_preview}]: {tokens_active}")
         print(f"  padded_tail: {ids_tail}")
         print()
