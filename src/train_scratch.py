@@ -11,6 +11,7 @@ from engine import evaluate_scratch, save_checkpoint, train_epoch_scratch
 from models.gru_classifier import GRUClassifier
 from models.lstm_classifier import LSTMClassifier
 from models.rnn_classifier import RNNClassifier
+from models.transformer_classifier import TransformerClassifier
 from utils import (
     count_parameters,
     get_device,
@@ -60,9 +61,22 @@ def build_model(model_cfg: dict, vocab_size: int, num_classes: int, pad_id: int)
             bidirectional=model_cfg.get("bidirectional", False),
         )
 
+    elif name == "transformer":
+        return TransformerClassifier(
+            vocab_size=vocab_size,
+            num_classes=num_classes,
+            pad_id=pad_id,
+            emb_dim=model_cfg["emb_dim"],
+            num_layers=model_cfg["num_layers"],
+            num_head=model_cfg["num_heads"],
+            ffn_dim=model_cfg["ffn_dim"],
+            dropout=model_cfg["dropout"],
+            max_len=model_cfg["max_len"],
+        )
+
     else:
         raise ValueError(
-            f"Unsupported model name: {name}. Only 'rnn' is kept in this repo right now."
+            f"Unsupported model name: {name}. Only 'rnn', 'gru', 'lstm', and 'transformer' are kept in this repo right now."
         )
 
 

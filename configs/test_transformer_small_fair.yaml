@@ -1,0 +1,32 @@
+seed: 42
+experiment_name: test_transformer_small_fair_ag_news_cpu
+
+system:
+  device: cpu
+  output_root: runs
+
+data:
+  train_subset: 20000
+  val_ratio: 0.1
+  test_subset: 2000
+  max_length: 64
+  batch_size: 32
+  num_workers: 0
+  max_vocab_size: 20000
+  min_freq: 2
+  lowercase: true
+
+model:
+  name: transformer
+  emb_dim: 96
+  num_layers: 2
+  ffn_dim: 256
+  num_heads: 4
+  dropout: 0.1
+  max_len: 64
+
+train:
+  epochs: 5
+  lr: 0.0003
+  weight_decay: 0.01
+  grad_clip: 1.0

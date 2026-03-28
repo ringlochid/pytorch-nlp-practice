@@ -104,17 +104,34 @@ def scratch_collate_fn(batch, pad_id: int):
     return {"input_ids": input_ids, "lengths": lengths, "labels": labels}
 
 
+def _shuffle_and_maybe_subset(dataset, subset_size: int | None, seed: int):
+    dataset = dataset.shuffle(seed=seed)
+    if subset_size is not None:
+        subset_size = min(subset_size, len(dataset))
+        dataset = dataset.select(range(subset_size))
+    return dataset
+
+
 def _load_ag_news_splits(
     train_subset: int | None, val_ratio: float, test_subset: int | None, seed: int
 ):
-    train_split = f"train[:{train_subset}]" if train_subset else "train"
-    test_split = f"test[:{test_subset}]" if test_subset else "test"
-
-    raw_train = load_dataset("ag_news", split=train_split)
-    raw_test = load_dataset("ag_news", split=test_split)
-    split = raw_train.train_test_split(test_size=val_ratio, seed=seed)
+    raw_train = load_dataset("ag_news", split="train")
+    raw_test = load_dataset("ag_news", split="test")
 
     label_names = raw_train.features["label"].names
+
+    raw_train = _shuffle_and_maybe_subset(raw_train, train_subset, seed)
+    raw_test = _shuffle_and_maybe_subset(raw_test, test_subset, seed)
+
+    try:
+        split = raw_train.train_test_split(
+            test_size=val_ratio,
+            seed=seed,
+            stratify_by_column="label",
+        )
+    except ValueError:
+        split = raw_train.train_test_split(test_size=val_ratio, seed=seed)
+
     return split["train"], split["test"], raw_test, label_names
 
 
