@@ -1,0 +1,37 @@
+seed: 42
+experiment_name: smoke_bert_ag_news_cpu
+
+system:
+  device: cpu
+  output_root: runs
+
+data:
+  train_subset: 256
+  val_ratio: 0.1
+  test_subset: 128
+  max_length: 64
+  batch_size: 4
+  num_workers: 0
+  ag_news_cache_dir: .cache/ag_news
+
+model:
+  name: bert
+  pretrained_model_name_or_path: .cache/local_bert_tiny_smoke
+  local_files_only: true
+  bootstrap_local_model: true
+  bootstrap:
+    train_subset_for_vocab: 2048
+    vocab_size: 2048
+    min_freq: 1
+    lowercase: true
+    hidden_size: 128
+    num_hidden_layers: 2
+    num_attention_heads: 2
+    intermediate_size: 256
+    max_position_embeddings: 128
+
+train:
+  epochs: 1
+  lr: 0.00005
+  weight_decay: 0.01
+  grad_clip: 1.0

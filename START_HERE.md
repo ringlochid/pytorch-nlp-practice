@@ -22,6 +22,15 @@ What success looks like:
 - prints epoch metrics
 - writes a run under `runs/`
 
+If you want to test the Hugging Face path on this VPS without depending on outbound network, run:
+
+```bash
+python src/train_bert.py --config configs/smoke_bert.yaml
+```
+
+That smoke config creates a tiny local checkpoint under `.cache/local_bert_tiny_smoke` the first time it runs.
+It is only for exercising the BERT training path offline.
+
 ## 3) Read the code in this order
 
 CrossEntropyLoss = log_softmax + NLLLoss
@@ -45,7 +54,14 @@ python src/train_scratch.py --config configs/scratch_rnn.yaml
 
 Stop there for now.
 
-The repo only keeps the RNN baseline. When you want to build GRU / LSTM / Transformer yourself, add them one by one.
+The scratch paths are already in place for `RNN`, `GRU`, `LSTM`, and `Transformer`.
+For a cautious CPU BERT run, use:
+
+```bash
+python src/train_bert.py --config configs/bert_tiny_vps.yaml
+```
+
+That config targets `prajjwal1/bert-tiny`, so it needs the checkpoint cached locally or downloadable on first use.
 
 ## What the `notebooks/` folder is for
 
